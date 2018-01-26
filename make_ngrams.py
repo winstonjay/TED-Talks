@@ -29,7 +29,7 @@ def main():
     ngrams_to_csv(foldername, n=3, outfile="ted_ngrams/trigram.csv")
 
 
-def generate_ngrams(directory, n=3):
+def generate_ngrams(directory, n=3, sample=50000):
     '''loop through a given directory generate and
     return a `collections.Counter` of ngrams'''
     counts = Counter()
@@ -48,13 +48,13 @@ def generate_ngrams(directory, n=3):
             tokens = transcript_tokenizer.tokenize(text.lower())
             tokens = ("<NUM>" if isnum.match(t) else t for t in tokens)
             counts.update(ngrams(tokens, n))
-    return counts
+    return counts.most_common(sample)
 
-def ngrams_to_csv(directory, n=3, outfile="ngram.csv"):
+def ngrams_to_csv(directory, n=3, sample=50000, outfile="ngram.csv"):
     "write ngram Counter to ' ' delimeted csv file with no header"
-    counts = generate_ngrams(directory, n)
+    counts = generate_ngrams(directory, n, sample)
     with open(outfile, "w") as out:
-        for keys, c in counts.items():
+        for keys, c in counts:
             out.write("{} {}\n".format(concat(keys), c))
     print("n={}. From '{}/' created file '{}' with {} unique entries".format(
             n, directory, outfile, len(counts)))
